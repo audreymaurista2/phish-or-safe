@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHISH OR SAFE: Digital Security Detective</title>
+<style>
+:root{
+  --navy:#17233b;--blue:#315c9b;--blue2:#eaf1fb;--gold:#d29b3f;
+  --cream:#f7f8fb;--white:#fff;--green:#238653;--green2:#e9f7ef;
+  --red:#c44343;--red2:#fff0f0;--text:#202938;--muted:#687386;
+  --border:#dfe4ec;--shadow:0 12px 30px rgba(23,35,59,.10)
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#f7f8fb,#eef3fa);font-family:Inter,Arial,sans-serif;color:var(--text)}
+button{font:inherit}
+.app{max-width:1050px;margin:auto;padding:20px}
+header{background:var(--navy);color:white;border-radius:22px;padding:22px 24px;box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:14px}.badge{font-size:30px;background:#fff;color:var(--navy);width:52px;height:52px;border-radius:15px;display:grid;place-items:center}
+h1{margin:0;font-size:24px} header p{margin:5px 0 0;color:#dce5f5}
+.progress-wrap{margin-top:17px}.progress-top{display:flex;justify-content:space-between;font-size:13px;color:#dce5f5;margin-bottom:7px}
+.progress{height:9px;background:#394761;border-radius:99px;overflow:hidden}.bar{height:100%;background:#e6b55d;width:0%;transition:.3s}
+.screen{display:none;margin-top:18px}.screen.active{display:block}
+.card{background:white;border:1px solid var(--border);border-radius:20px;padding:22px;box-shadow:var(--shadow)}
+.hero{text-align:center;padding:38px 24px}.hero .detective{font-size:62px}
+h2{margin:0 0 10px;font-size:22px}h3{margin:0 0 8px}
+.lead{color:var(--muted);line-height:1.6}
+.btn{border:0;border-radius:12px;padding:12px 18px;font-weight:700;cursor:pointer;transition:.15s}
+.btn:hover{transform:translateY(-1px)}.primary{background:var(--navy);color:white}.secondary{background:var(--blue2);color:var(--navy)}
+.green{background:var(--green);color:white}.danger{background:var(--red);color:white}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}.rule{background:var(--cream);padding:15px;border-radius:14px;border:1px solid var(--border)}.rule b{display:block;margin-bottom:5px}.rule span{font-size:13px;color:var(--muted);line-height:1.5}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}.pill{background:var(--blue2);color:var(--blue);padding:6px 10px;border-radius:99px;font-size:12px;font-weight:700}
+.message{border:1px solid #cfd6e2;border-radius:18px;overflow:hidden;margin:15px 0;background:#fbfcfe}
+.msghead{background:#f1f4f8;padding:13px 16px;display:flex;justify-content:space-between;gap:10px;font-size:13px}.msgbody{padding:18px;line-height:1.7;white-space:pre-line}.url{display:inline-block;background:#f3f5f8;padding:6px 8px;border-radius:7px;word-break:break-all;color:#315c9b;font-family:monospace;font-size:13px}
+.section-title{margin-top:22px;margin-bottom:9px;font-size:15px;font-weight:800}
+.options{display:grid;gap:9px}.check,.radio{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--border);padding:12px;border-radius:12px;background:white;cursor:pointer}.check:hover,.radio:hover{background:#f7f9fc}.check input,.radio input{margin-top:4px;accent-color:var(--blue)}
+.feedback{border-radius:15px;padding:16px;margin-top:15px;line-height:1.6}.feedback.good{background:var(--green2);border:1px solid #b8e0c8}.feedback.bad{background:var(--red2);border:1px solid #f0bcbc}
+.feedback strong{display:block;margin-bottom:5px}.scoreline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--cream);border:1px solid var(--border);border-radius:13px;padding:12px;margin-top:12px}
+.level-title{display:flex;justify-content:space-between;gap:10px;align-items:center}.timer{font-weight:800;color:var(--blue)}
+.final-note{background:#fff8e9;border:1px solid #efd39a;padding:14px;border-radius:13px;line-height:1.5}
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:15px 0}.stat{background:var(--cream);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center}.stat b{display:block;font-size:22px;color:var(--navy)}.stat span{font-size:12px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}th,td{padding:10px;border:1px solid var(--border);text-align:left;vertical-align:top}th{background:var(--navy);color:white}
+.tag{display:inline-block;padding:4px 7px;border-radius:7px;background:#f1f4f8;margin:2px;font-size:11px}.miss{color:var(--red);font-weight:700}.ok{color:var(--green);font-weight:700}
+.small{font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:720px){.app{padding:10px}.rules,.summary-grid{grid-template-columns:1fr}.card{padding:16px}header{border-radius:17px}h1{font-size:19px}.msghead{flex-direction:column}.actions .btn{width:100%}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><div class="badge">🕵️</div><div><h1>PHISH OR SAFE</h1><p>Digital Security Detective</p></div></div>
+  <div class="progress-wrap">
+    <div class="progress-top"><span id="progressText">Belum mulai</span><span id="scoreText">Skor: 0</span></div>
+    <div class="progress"><div class="bar" id="progressBar"></div></div>
+  </div>
+</header>
+
+<section id="start" class="screen active">
+<div class="card hero">
+  <div class="detective">🕵️‍♀️</div>
+  <h2>Siap menjadi Digital Security Detective?</h2>
+  <p class="lead">Selidiki pesan digital, temukan bukti yang mencurigakan, lalu tentukan tindakan paling aman. Jangan hanya menebak: gunakan bukti.</p>
+  <div class="rules">
+    <div class="rule"><b>🔎 Investigasi</b><span>Temukan indikator phishing dari pesan yang diberikan.</span></div>
+    <div class="rule"><b>🧠 Ambil keputusan</b><span>Pilih tindakan berdasarkan bukti, bukan sekadar intuisi.</span></div>
+    <div class="rule"><b>💡 Belajar dari feedback</b><span>Jika kurang tepat, baca alasan dan perbaiki keputusan.</span></div>
+  </div>
+
+  <div class="section-title" style="margin-top:20px">🎮 Cara Bermain</div>
+  <div class="card" style="background:#f8fafc;border:1px solid var(--border);box-shadow:none;padding:16px">
+    <ol style="margin:0;padding-left:22px;display:grid;gap:10px">
+      <li><b>Baca pesan dengan teliti.</b> Perhatikan pengirim, isi pesan, URL/tautan, urgensi, dan konteks.</li>
+      <li><b>Tandai indikator mencurigakan.</b> Pilih semua tanda yang menurutmu berpotensi menunjukkan phishing.</li>
+      <li><b>Pilih bukti terkuat.</b> Tentukan bagian pesan yang paling mendukung keputusanmu.</li>
+      <li><b>Tentukan tindakan paling aman.</b> Jangan terburu-buru mengikuti instruksi di pesan.</li>
+      <li><b>Baca feedback.</b> Kalau keputusanmu belum tepat, cari indikator yang terlewat lalu gunakan tombol <b>Coba Lagi</b>.</li>
+      <li><b>Lanjutkan hingga tantangan akhir.</b> Kasus akhir lebih ambigu dan meminta kamu menerapkan prinsip pada pesan baru.</li>
+    </ol>
+    <div style="margin-top:14px;padding:12px 14px;border-radius:12px;background:#fff7e8;border:1px solid #ead7a0">
+      <b>💡 Tips Detektif:</b> Jangan percaya hanya karena nama/logo terlihat resmi. Selalu cek <b>pengirim, URL, urgensi, konteks, dan permintaan data</b> sebelum mengambil tindakan.
+    </div>
+  </div>
+
+  <p class="small"><b>Waktu:</b> sekitar 10–15 menit &nbsp;•&nbsp; <b>Perangkat:</b> smartphone/laptop &nbsp;•&nbsp; Semua data adalah simulasi.</p>
+  <div class="actions" style="justify-content:center"><button class="btn primary" onclick="startGame()">Mulai Investigasi →</button></div>
+</div>
+</section>
+
+<section id="game" class="screen">
+<div class="card">
+  <div class="level-title"><div><h2 id="caseTitle"></h2><div class="meta"><span class="pill" id="levelPill"></span><span class="pill" id="casePill"></span></div></div><div class="timer" id="timer"></div></div>
+  <div class="message">
+    <div class="msghead"><div><b id="sender"></b><br><span id="subject"></span></div><span id="channel" class="pill"></span></div>
+    <div class="msgbody" id="msgBody"></div>
+  </div>
+
+  <div class="section-title">1. Tandai indikator yang menurutmu mencurigakan</div>
+  <div class="options" id="indicatorOptions"></div>
+
+  <div class="section-title">2. Pilih bukti terkuat yang mendukung keputusanmu</div>
+  <div class="options" id="evidenceOptions"></div>
+
+  <div class="section-title">3. Tentukan tindakan paling aman</div>
+  <div class="options" id="actionOptions"></div>
+
+  <div id="feedbackArea"></div>
+  <div class="actions" id="gameActions"><button class="btn primary" onclick="submitCase()">Periksa Keputusan</button></div>
+</div>
+</section>
+
+<section id="final" class="screen">
+<div class="card">
+  <h2>🚨 Tantangan Akhir: Kasus Baru</h2>
+  <p class="lead">Kasus ini berbeda dari latihan sebelumnya dan lebih ambigu. Gunakan prinsip yang sudah kamu pelajari.</p>
+  <div class="final-note"><b>Aturan final:</b> pilih minimal <b>3 indikator/bukti</b> dan satu tindakan aman. Keputusan harus berdasarkan bukti.</div>
+  <div class="message">
+    <div class="msghead"><div><b>Secure Account Center</b><br><span>Security verification required</span></div><span class="pill">Email</span></div>
+    <div class="msgbody">Kami mendeteksi upaya masuk baru ke akun Anda dari perangkat yang belum dikenali.
+Jika aktivitas ini bukan milik Anda, tinjau aktivitas akun dalam waktu 30 menit untuk mencegah pembatasan sementara.
+
+Tinjau aktivitas:
+<span class="url">https://account-review-secure.example/verify</span>
+
+Jika Anda sudah melakukan verifikasi, abaikan pesan ini.</div>
+  </div>
+  <div class="section-title">Pilih minimal 3 indikator/bukti</div>
+  <div class="options" id="finalIndicators"></div>
+  <div class="section-title">Pilih tindakan paling aman</div>
+  <div class="options" id="finalActions"></div>
+  <div id="finalFeedback"></div>
+  <div class="actions"><button class="btn primary" onclick="submitFinal()">Periksa Tantangan Akhir</button></div>
+</div>
+</section>
+
+<section id="result" class="screen">
+<div class="card">
+  <h2>🎉 Investigasi Selesai</h2>
+  <p class="lead">Gunakan ringkasan ini untuk melihat bagian yang sudah dikuasai dan bagian yang masih perlu dilatih.</p>
+  <div class="summary-grid">
+    <div class="stat"><b id="finalScore">0</b><span>Skor</span></div>
+    <div class="stat"><b id="accuracy">0%</b><span>Akurasi kasus</span><small id="retryCases" class="small" style="display:block;margin-top:4px">0 kasus perlu coba lagi</small></div>
+    <div class="stat"><b id="attempts">0</b><span>Total percobaan</span></div>
+    <div class="stat"><b id="finalStatus">-</b><span>Tantangan akhir</span></div>
+  </div>
+  <h3>Ringkasan Kasus</h3>
+  <div id="caseTable"></div>
+  <h3 style="margin-top:22px">🔎 Indikator yang Sering Terlewat</h3>
+  <div id="missedList"></div>
+  <h3 style="margin-top:22px">👩‍🏫 Ringkasan untuk Guru</h3>
+  <div id="teacherSummary" class="final-note"></div>
+  <div class="actions"><button class="btn primary" onclick="restart()">Main Lagi</button><button class="btn secondary" onclick="window.print()">Cetak / Simpan Ringkasan</button></div>
+  <p class="small" style="margin-top:15px">Catatan: data permainan disimpan selama sesi browser menggunakan JavaScript. Tidak ada data pribadi atau kredensial yang dikumpulkan.</p>
+</div>
+</section>
+</div>
+
+<script>
+const cases=[
+{level:1,title:"Kasus 1 — Hadiah Tak Terduga",channel:"WhatsApp",sender:"Pusat Hadiah Digital",subject:"Selamat! Anda terpilih menerima hadiah",body:`Selamat! Nomor Anda terpilih mendapatkan hadiah Rp10.000.000.
+Untuk mencairkan hadiah hari ini, lakukan verifikasi melalui tautan berikut:
+
+https://hadiah-verifikasi.example/claim
+
+Segera lakukan verifikasi sebelum pukul 18.00 atau hadiah dianggap hangus.`,ind:[
+["unexpected","Hadiah tidak terduga","Anda tidak mengikuti program hadiah apa pun."],
+["urgency","Bahasa mendesak","Ada batas waktu yang menekan penerima."],
+["url","Tautan perlu diverifikasi","Alamat tujuan perlu diperiksa sebelum dikunjungi."],
+["data","Permintaan verifikasi","Klaim hadiah meminta tindakan melalui tautan."]
+],evidence:["Pesan menawarkan hadiah yang tidak diharapkan dan mendorong tindakan cepat.","Pesan menggunakan sapaan yang ramah.","Pesan memiliki emoji hadiah."],actions:["Klik tautan dan segera mengisi data.","Verifikasi melalui kanal resmi yang diketahui dan jangan memasukkan data melalui tautan tersebut.","Balas pesan dengan mengirimkan nomor identitas."],correct:["unexpected","urgency","url"],action:1,
+feedback:"Hadiah tidak terduga, tekanan waktu, dan tautan yang belum diverifikasi merupakan alasan untuk berhenti dan melakukan verifikasi melalui kanal resmi."},
+{level:1,title:"Kasus 2 — Akun Akan Diblokir",channel:"Email",sender:"Account Security",subject:"Peringatan: akun akan dibatasi",body:`Aktivitas tidak biasa terdeteksi pada akun Anda.
+Untuk menghindari pembatasan, masuk melalui tautan berikut dalam 15 menit:
+
+https://account-check.example/login
+
+Masukkan email dan kata sandi Anda untuk menyelesaikan pemeriksaan.`,ind:[
+["urgency","Ancaman/pembatasan","Pesan menekan penerima dengan ancaman pembatasan."],
+["url","Tautan login perlu diverifikasi","Jangan memasukkan kredensial melalui tautan yang belum diverifikasi."],
+["data","Meminta kata sandi","Pesan meminta informasi sensitif."],
+["sender","Pengirim generik","Nama pengirim tidak cukup untuk membuktikan keaslian."]
+],evidence:["Pesan meminta kata sandi melalui tautan dan memakai tekanan waktu.","Email memiliki format yang rapi.","Subjek menggunakan kata 'Security'."],actions:["Masukkan kata sandi agar akun tidak diblokir.","Buka situs resmi layanan secara mandiri atau gunakan kanal resmi untuk memeriksa aktivitas akun.","Teruskan kata sandi kepada pengirim untuk verifikasi."],correct:["urgency","url","data"],action:1,
+feedback:"Permintaan kata sandi melalui tautan yang belum diverifikasi adalah tanda bahaya. Tekanan waktu juga dapat mendorong keputusan tergesa-gesa."},
+{level:2,title:"Kasus 3 — Paket Menunggu",channel:"SMS",sender:"Delivery Notification",subject:"Alamat pengiriman perlu diperbarui",body:`Paket Anda belum dapat dikirim karena alamat tidak lengkap.
+Perbarui alamat dalam 2 jam agar paket tidak dikembalikan:
+
+https://delivery-update.example/address
+
+Biaya penjadwalan ulang mungkin dikenakan.`,ind:[
+["urgency","Batas waktu 2 jam","Penerima didorong segera bertindak."],
+["url","Tautan tujuan perlu diverifikasi","Alamat web tidak otomatis aman hanya karena konteksnya pengiriman."],
+["context","Konteks paket perlu dicek","Pastikan memang sedang menunggu paket."],
+["data","Meminta informasi alamat","Data alamat sebaiknya diberikan melalui kanal resmi."]
+],evidence:["Ada batas waktu, tautan pembaruan, dan permintaan data alamat.","Pesan menyebutkan kata 'paket'.","Pesan tidak menggunakan nama penerima."],actions:["Klik tautan dan memasukkan alamat.","Periksa status pengiriman melalui aplikasi/situs resmi yang biasa digunakan tanpa mengikuti tautan pesan.","Balas SMS dengan mengirim alamat lengkap."],correct:["urgency","url","context"],action:1,
+feedback:"Konteks pengiriman bisa membuat pesan tampak masuk akal. Justru karena itu, verifikasi melalui kanal resmi penting sebelum memberikan data."},
+{level:2,title:"Kasus 4 — Undangan Kerja",channel:"Email",sender:"Recruitment Team",subject:"Undangan interview — segera konfirmasi",body:`Halo,
+Profil Anda menarik perhatian kami untuk posisi Content Assistant.
+Silakan konfirmasi jadwal melalui formulir:
+
+https://career-form.example/confirm
+
+Formulir meminta nomor telepon, alamat rumah, dan foto identitas.
+Konfirmasi hari ini agar slot interview tetap tersedia.`,ind:[
+["data","Meminta data sensitif","Foto identitas dan alamat rumah perlu diperlakukan hati-hati."],
+["urgency","Tekanan untuk segera konfirmasi","Batas waktu dapat mendorong tindakan tanpa verifikasi."],
+["url","Formulir perlu diverifikasi","Alamat formulir perlu diperiksa sebelum digunakan."],
+["context","Konteks rekrutmen perlu dicek","Pastikan posisi/perusahaan dan proses rekrutmen benar-benar ada."]
+],evidence:["Formulir meminta foto identitas dan alamat rumah sebelum proses terverifikasi.","Pesan memakai bahasa profesional.","Ada posisi pekerjaan yang terdengar masuk akal."],actions:["Mengisi semua data agar peluang interview tidak hilang.","Verifikasi lowongan dan identitas perekrut melalui kanal resmi sebelum memberikan data sensitif.","Mengirim foto identitas lewat balasan email."],correct:["data","context","url"],action:1,
+feedback:"Pesan profesional tidak otomatis aman. Permintaan data sensitif dan tautan formulir harus diverifikasi melalui kanal resmi."},
+{level:3,title:"Kasus 5 — Verifikasi Perangkat Baru",channel:"Email",sender:"Account Notice",subject:"Perangkat baru terdeteksi",body:`Kami mendeteksi login baru dari perangkat yang belum dikenali.
+Jika Anda tidak mengenali aktivitas ini, tinjau keamanan akun Anda:
+
+https://security-review.example/device
+
+Periksa sekarang untuk mencegah gangguan akses.`,ind:[
+["url","Tautan keamanan perlu diverifikasi","Tautan bertema keamanan dapat tetap digunakan untuk menipu."],
+["urgency","Tekanan tersirat","Frasa 'periksa sekarang' mendorong tindakan cepat."],
+["sender","Pengirim generik","Nama pengirim tidak cukup untuk memastikan keaslian."],
+["context","Aktivitas login perlu diverifikasi","Informasi login baru perlu dicek melalui kanal resmi."]
+],evidence:["Tautan keamanan dan instruksi segera bertindak perlu diverifikasi melalui kanal resmi.","Pesan memiliki kalimat yang jelas.","Subjek membahas perangkat baru."],actions:["Klik tautan karena pesannya tentang keamanan akun.","Buka layanan melalui alamat/aplikasi resmi secara mandiri dan periksa aktivitas login dari sana.","Balas dengan kata sandi."],correct:["url","urgency","context"],action:1,
+feedback:"Pesan tentang keamanan akun bisa terasa meyakinkan. Prinsip pentingnya adalah jangan menjadikan tautan dalam pesan sebagai satu-satunya jalan verifikasi."},
+{level:3,title:"Kasus 6 — Pembaruan Data Layanan",channel:"Email",sender:"Service Update",subject:"Pembaruan data diperlukan",body:`Untuk menjaga layanan tetap aktif, data akun perlu diperbarui.
+Gunakan halaman berikut untuk menyelesaikan pembaruan:
+
+https://profile-update.example/continue
+
+Pembaruan mencakup nomor telepon, tanggal lahir, dan kode verifikasi.
+Jika tidak selesai hari ini, proses layanan dapat tertunda.`,ind:[
+["data","Meminta kode verifikasi","Kode verifikasi bersifat sensitif dan tidak boleh diberikan sembarangan."],
+["urgency","Batas waktu hari ini","Pesan menciptakan tekanan waktu."],
+["url","Tautan perlu diverifikasi","Alamat web dalam pesan perlu diperiksa."],
+["sender","Pengirim generik","Nama pengirim tidak membuktikan identitas layanan."]
+],evidence:["Pesan meminta kode verifikasi dan menggunakan tekanan waktu.","Pesan menjelaskan tujuan pembaruan.","Ada nomor telepon dalam data yang diminta."],actions:["Mengikuti tautan dan memasukkan kode verifikasi.","Masuk melalui aplikasi/situs resmi yang biasa digunakan dan cek apakah pembaruan benar-benar diperlukan.","Mengirim kode verifikasi dengan membalas email."],correct:["data","urgency","url"],action:1,
+feedback:"Kode verifikasi adalah informasi sensitif. Jangan memberikannya melalui pesan yang belum diverifikasi; gunakan kanal resmi untuk memeriksa kebutuhan pembaruan."}
+];
+
+const finalInd=[
+["url","URL menggunakan domain simulasi yang tidak dapat dianggap sebagai bukti keaslian layanan."],
+["urgency","Ada tekanan waktu 30 menit yang dapat mendorong tindakan tergesa-gesa."],
+["context","Pesan menyebut aktivitas login, tetapi informasi itu perlu diverifikasi melalui kanal resmi."],
+["sender","Nama 'Secure Account Center' bersifat generik dan tidak cukup untuk membuktikan identitas."],
+["data","Tindakan verifikasi berpotensi membawa pengguna ke halaman yang dapat meminta data."]
+];
+const indicatorNames={
+  unexpected:"Hadiah/klaim tidak terduga",
+  urgency:"Tekanan waktu/urgensi",
+  url:"URL atau tautan",
+  data:"Permintaan data sensitif",
+  sender:"Pengirim",
+  context:"Konteks pesan"
+};
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function indicatorLabel(code){
+  return indicatorNames[code]||code;
+}
+
+let state={
+  idx:0,
+  score:0,
+  attempts:0,
+  results:[],
+  missed:{},
+  final:null,
+  start:0,
+  elapsed:0
+};
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function updateHeader(){
+  const total=cases.length+1,done=state.idx;
+  document.getElementById("progressText").textContent=
+    done<cases.length?`Level ${cases[done].level} • Kasus ${done+1} dari ${cases.length}`:"Tantangan akhir";
+  document.getElementById("scoreText").textContent=`Skor: ${state.score}`;
+  document.getElementById("progressBar").style.width=Math.min(100,(done/total)*100)+"%";
+}
+
+function startGame(){
+  state={
+    idx:0,
+    score:0,
+    attempts:0,
+    results:[],
+    missed:{},
+    final:null,
+    start:Date.now(),
+    elapsed:0
+  };
+  show("game");
+  renderCase();
+  updateHeader();
+}
+
+function renderCase(){
+  const c=cases[state.idx];
+
+  document.getElementById("caseTitle").textContent=c.title;
+  document.getElementById("levelPill").textContent=
+    `Level ${c.level} • ${c.level===1?"Deteksi dasar":c.level===2?"Analisis konteks":"Kasus ambigu"}`;
+  document.getElementById("casePill").textContent=`Kasus ${state.idx+1}/${cases.length}`;
+  document.getElementById("sender").textContent=c.sender;
+  document.getElementById("subject").textContent=c.subject;
+  document.getElementById("channel").textContent=c.channel;
+  document.getElementById("msgBody").innerHTML=c.body.replace(/(https?:\/\/[^\s]+)/g,'<span class="url">$1</span>');
+
+  // Urutan pilihan diacak setiap kali kasus ditampilkan, termasuk saat Coba Lagi.
+  const shuffledIndicators=shuffle(c.ind);
+  const shuffledEvidence=shuffle(c.evidence.map((text,originalIndex)=>({text,originalIndex})));
+  const shuffledActions=shuffle(c.actions.map((text,originalIndex)=>({text,originalIndex})));
+
+  document.getElementById("indicatorOptions").innerHTML=shuffledIndicators.map(x=>
+    `<label class="check"><input type="checkbox" value="${x[0]}"> <span><b>${x[1]}</b><br><span class="small">${x[2]}</span></span></label>`
+  ).join("");
+
+  document.getElementById("evidenceOptions").innerHTML=shuffledEvidence.map(x=>
+    `<label class="radio"><input type="radio" name="evidence" value="${x.originalIndex}"> <span>${x.text}</span></label>`
+  ).join("");
+
+  document.getElementById("actionOptions").innerHTML=shuffledActions.map(x=>
+    `<label class="radio"><input type="radio" name="action" value="${x.originalIndex}"> <span>${x.text}</span></label>`
+  ).join("");
+
+  document.getElementById("feedbackArea").innerHTML="";
+  document.getElementById("gameActions").innerHTML='<button class="btn primary" onclick="submitCase()">Periksa Keputusan</button>';
+}
+
+function getChecked(container){
+  return [...document.querySelectorAll(container+" input:checked")].map(x=>x.value);
+}
+
+function submitCase(){
+  const c=cases[state.idx];
+  const inds=getChecked("#indicatorOptions");
+  const ev=document.querySelector('input[name="evidence"]:checked');
+  const act=document.querySelector('input[name="action"]:checked');
+
+  if(!ev||!act||inds.length<1){
+    document.getElementById("feedbackArea").innerHTML=
+      '<div class="feedback bad"><strong>Lengkapi investigasimu.</strong>Pilih minimal satu indikator, satu bukti, dan satu tindakan sebelum memeriksa keputusan.</div>';
+    return;
+  }
+
+  state.attempts++;
+
+  const correctIndicators=c.correct;
+  const selectedCorrect=correctIndicators.filter(x=>inds.includes(x));
+  const missed=correctIndicators.filter(x=>!inds.includes(x));
+  const extraIndicators=inds.filter(x=>!correctIndicators.includes(x));
+  const indicatorOk=
+    selectedCorrect.length===correctIndicators.length &&
+    extraIndicators.length===0 &&
+    inds.length===correctIndicators.length;
+
+  const evidenceOk=Number(ev.value)===0;
+  const actionOk=Number(act.value)===c.action;
+
+  // Skor mengikuti logika lama: setiap pemeriksaan benar tetap memberi poin.
+  let pts=0;
+  if(indicatorOk)pts+=10;
+  if(actionOk)pts+=10;
+  if(evidenceOk)pts+=5;
+  const good=indicatorOk&&actionOk&&evidenceOk;
+
+  missed.forEach(m=>state.missed[m]=(state.missed[m]||0)+1);
+  state.score+=pts;
+
+  // Satu hasil untuk satu kasus; percobaan ulang memperbarui kasus yang sama.
+  let result=state.results[state.idx];
+  if(!result){
+    result={
+      title:c.title,
+      firstAttemptGood:good,
+      attempts:1,
+      totalPts:pts,
+      missed:[],
+      last:{indicatorOk,evidenceOk,actionOk,missed:[...missed],extraIndicators:[...extraIndicators]}
+    };
+    state.results[state.idx]=result;
+  }else{
+    result.attempts++;
+    result.totalPts+=pts;
+    result.last={indicatorOk,evidenceOk,actionOk,missed:[...missed],extraIndicators:[...extraIndicators]};
+  }
+
+  const fb=document.getElementById("feedbackArea");
+
+  if(good){
+    fb.innerHTML=
+      `<div class="feedback good"><strong>✅ Keputusan tepat! +${pts} poin</strong>
+      ${c.feedback}<br><br>
+      <b>Indikator:</b> tepat.
+      <b>Bukti:</b> tepat.
+      <b>Tindakan:</b> tepat.<br><br>
+      <b>Bukti yang mendukung:</b> ${c.evidence[0]}</div>`;
+    document.getElementById("gameActions").innerHTML=
+      '<button class="btn green" onclick="nextCase()">Lanjut →</button>';
+  }else{
+    const indicatorCorrectText=selectedCorrect.length
+      ? selectedCorrect.map(indicatorLabel).join(", ")
+      : "tidak ada";
+    const indicatorWrongCodes=[...missed,...extraIndicators];
+    const indicatorWrongText=indicatorWrongCodes.length
+      ? indicatorWrongCodes.map(indicatorLabel).join(", ")
+      : "tidak ada";
+
+    const indicatorState=indicatorOk
+      ? `sudah tepat: ${indicatorCorrectText}`
+      : `sudah tepat: ${indicatorCorrectText}; belum tepat: ${indicatorWrongText}`;
+    const evidenceState=evidenceOk
+      ? "sudah tepat"
+      : "belum tepat";
+    const actionState=actionOk
+      ? "sudah tepat"
+      : "belum tepat";
+
+    fb.innerHTML=
+      `<div class="feedback bad">
+        <strong>⚠️ Keputusanmu belum sepenuhnya tepat.</strong>
+        <b>Indikator:</b> ${indicatorState}.<br>
+        <b>Bukti:</b> ${evidenceState}.<br>
+        <b>Tindakan:</b> ${actionState}.<br><br>
+        ${c.feedback}<br><br>
+        <b>Petunjuk:</b> cari indikator yang benar-benar muncul pada pesan, pilih bukti yang paling langsung mendukung temuan tersebut, lalu gunakan kanal resmi sebagai jalur verifikasi.
+      </div>`;
+    document.getElementById("gameActions").innerHTML=
+      '<button class="btn primary" onclick="retryCase()">Coba Lagi</button>';
+  }
+
+  updateHeader();
+}
+
+function retryCase(){
+  renderCase();
+  updateHeader();
+}
+
+function nextCase(){
+  state.idx++;
+  if(state.idx>=cases.length){
+    showFinal();
+  }else{
+    renderCase();
+    updateHeader();
+  }
+}
+
+function showFinal(){
+  show("final");
+  document.getElementById("progressText").textContent="Tantangan akhir";
+  document.getElementById("progressBar").style.width="88%";
+
+  // Tantangan akhir ikut diacak.
+  const shuffledFinalIndicators=shuffle(finalInd);
+  const shuffledFinalActions=shuffle([
+    {text:"Klik tautan dan ikuti proses verifikasi.",originalIndex:0},
+    {text:"Buka aplikasi/situs resmi secara mandiri dan periksa aktivitas akun dari sana.",originalIndex:1},
+    {text:"Balas email dengan kode verifikasi untuk memastikan identitas.",originalIndex:2}
+  ]);
+
+  document.getElementById("finalIndicators").innerHTML=
+    shuffledFinalIndicators.map(x=>
+      `<label class="check"><input type="checkbox" value="${x[0]}"> <span><b>${indicatorLabel(x[0])}</b><br><span class="small">${x[1]}</span></span></label>`
+    ).join("");
+
+  document.getElementById("finalActions").innerHTML=
+    shuffledFinalActions.map(x=>
+      `<label class="radio"><input type="radio" name="finalAction" value="${x.originalIndex}"><span>${x.text}</span></label>`
+    ).join("");
+}
+
+function submitFinal(){
+  const inds=getChecked("#finalIndicators");
+  const act=document.querySelector('input[name="finalAction"]:checked');
+
+  if(inds.length<3||!act){
+    document.getElementById("finalFeedback").innerHTML=
+      '<div class="feedback bad"><strong>Investigasi belum lengkap.</strong>Pilih minimal tiga indikator/bukti dan satu tindakan.</div>';
+    return;
+  }
+
+  const required=["url","urgency","context"];
+  const hit=required.filter(x=>inds.includes(x)).length;
+  const ok=hit>=2&&Number(act.value)===1;
+
+  state.attempts++;
+  state.score+=ok?25:0;
+  state.final={
+    ok,
+    inds:[...inds],
+    action:Number(act.value),
+    indicatorResults:finalInd.map(([code])=>({
+      code,
+      selected:inds.includes(code),
+      required:required.includes(code),
+      correct:required.includes(code)&&inds.includes(code)
+    }))
+  };
+
+  const finalIndicatorFeedback=required.map(code=>
+    `${indicatorLabel(code)}: ${inds.includes(code)?"tepat":"belum tepat"}`
+  ).join(" • ");
+
+  document.getElementById("finalFeedback").innerHTML=ok
+    ? `<div class="feedback good"><strong>🎯 Tantangan akhir berhasil!</strong>
+       Kamu menggunakan beberapa bukti penting dan memilih verifikasi melalui kanal resmi. Ini menunjukkan penerapan prinsip pada kasus baru.<br><br>
+       <b>Hasil indikator kunci:</b> ${finalIndicatorFeedback}</div>`
+    : `<div class="feedback bad"><strong>Belum berhasil pada kasus akhir.</strong>
+       Jangan menjadikan tautan dalam pesan sebagai satu-satunya jalan verifikasi. Periksa konteks, urgensi, dan URL, lalu gunakan kanal resmi secara mandiri.<br><br>
+       <b>Hasil indikator kunci:</b> ${finalIndicatorFeedback}</div>`;
+
+  document.querySelector("#final .actions").innerHTML=
+    '<button class="btn green" onclick="showResults()">Lihat Ringkasan Hasil →</button>';
+  document.getElementById("scoreText").textContent=`Skor: ${state.score}`;
+}
+
+function showResults(){
+  const elapsed=Math.round((Date.now()-state.start)/1000);
+  state.elapsed=elapsed;
+  show("result");
+
+  document.getElementById("finalScore").textContent=state.score;
+
+  // Akurasi hanya berdasarkan percobaan pertama setiap kasus.
+  const firstAttemptGood=state.results.filter(x=>x.firstAttemptGood).length;
+  document.getElementById("accuracy").textContent=
+    Math.round((firstAttemptGood/cases.length)*100)+"%";
+
+  // Jumlah kasus yang membutuhkan percobaan ulang.
+  const retryCases=state.results.filter(x=>x.attempts>1).length;
+  document.getElementById("retryCases").textContent=
+    `${retryCases} ${retryCases===1?"kasus":"kasus"} perlu coba lagi`;
+
+  document.getElementById("attempts").textContent=state.attempts;
+  document.getElementById("finalStatus").textContent=state.final?.ok?"Lulus":"Perlu latihan";
+
+  document.getElementById("caseTable").innerHTML=
+    `<table>
+      <tr><th>Kasus</th><th>Hasil</th><th>Poin</th><th>Catatan</th></tr>
+      ${state.results.map(r=>{
+        const wrong=[];
+        if(!r.last.indicatorOk){
+          const badIndicatorCodes=[...(r.last.missed||[]),...(r.last.extraIndicators||[])];
+          const badIndicatorNames=badIndicatorCodes.map(indicatorLabel);
+          wrong.push(`indikator${badIndicatorNames.length?` (${badIndicatorNames.join(", ")})`:""}`);
+        }
+        if(!r.last.evidenceOk)wrong.push("bukti");
+        if(!r.last.actionOk)wrong.push("tindakan");
+
+        const note=r.firstAttemptGood
+          ? "Percobaan pertama tepat pada indikator, bukti, dan tindakan."
+          : `Perlu perbaikan pada: ${wrong.join(", ")||"indikator, bukti, atau tindakan"}.`;
+
+        return `<tr>
+          <td>${r.title}${r.attempts>1?`<br><span class="small">${r.attempts-1}× percobaan ulang</span>`:""}</td>
+          <td class="${r.firstAttemptGood?"ok":"miss"}">${r.firstAttemptGood?"Tepat":"Perlu perbaikan"}</td>
+          <td>${r.totalPts}</td>
+          <td>${note}</td>
+        </tr>`;
+      }).join("")}
+    </table>`;
+
+  const sorted=Object.entries(state.missed).sort((a,b)=>b[1]-a[1]);
+  document.getElementById("missedList").innerHTML=
+    sorted.length
+      ? sorted.map(([k,v])=>`<span class="tag">${indicatorLabel(k)}: ${v}×</span>`).join(" ")
+      : '<span class="ok">Tidak ada indikator utama yang sering terlewat.</span>';
+
+  let advice=[];
+  if((state.missed.url||0)>0)
+    advice.push("<b>URL/tautan:</b> berikan latihan memeriksa alamat tujuan dan membandingkannya dengan kanal resmi.");
+  if((state.missed.urgency||0)>0)
+    advice.push("<b>Urgensi:</b> berikan latihan mengenali tekanan waktu dan membiasakan jeda sebelum bertindak.");
+  if((state.missed.data||0)>0)
+    advice.push("<b>Data sensitif:</b> berikan latihan membedakan informasi umum dan informasi yang tidak boleh dibagikan.");
+  if((state.missed.context||0)>0)
+    advice.push("<b>Konteks:</b> berikan beberapa kasus ambigu agar siswa terbiasa memverifikasi konteks.");
+  if(!advice.length)
+    advice.push("<b>Pengayaan:</b> berikan kasus phishing yang lebih ambigu dan minta siswa menjelaskan alasan keputusan secara tertulis.");
+  if(!state.final?.ok)
+    advice.push("<b>Transfer:</b> siswa perlu mendapat kasus baru dengan tingkat ambiguitas lebih tinggi sebelum dinyatakan konsisten menerapkan prinsip.");
+
+  // Hasil per indikator pada tantangan akhir.
+  let finalIndicatorReport="";
+  if(state.final?.indicatorResults){
+    finalIndicatorReport=`
+      <div style="margin-top:12px">
+        <b>Hasil per indikator — Tantangan Akhir</b>
+        <table>
+          <tr><th>Indikator</th><th>Hasil</th><th>Status pilihan</th></tr>
+          ${state.final.indicatorResults.map(r=>{
+            let resultText;
+            if(r.required) resultText=r.correct?"Tepat":"Belum tepat";
+            else resultText=r.selected?"Dipilih (bukan indikator kunci)":"Tidak dipilih";
+            const cls=r.correct?"ok":(r.required?"miss":"");
+            return `<tr>
+              <td>${indicatorLabel(r.code)}</td>
+              <td class="${cls}">${resultText}</td>
+              <td>${r.selected?"Dipilih":"Tidak dipilih"}</td>
+            </tr>`;
+          }).join("")}
+        </table>
+      </div>`;
+  }
+
+  document.getElementById("teacherSummary").innerHTML=
+    advice.join("<br><br>")+
+    finalIndicatorReport+
+    `<br><br><b>Interpretasi umum:</b> skor harus dibaca bersama pola kesalahan, bukan sebagai satu-satunya ukuran keberhasilan. Akurasi kasus dihitung dari percobaan pertama tiap kasus, sedangkan percobaan ulang ditampilkan terpisah. Tantangan akhir digunakan untuk melihat penerapan pada kasus baru.`;
+
+  updateHeader();
+}
+
+function restart(){startGame()}
+</script>
+</body>
+</html>
